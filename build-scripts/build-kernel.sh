@@ -90,13 +90,19 @@ configure_kernel() {
     
     cd "$SOURCE_DIR"
     
-    # Use defconfig if available
-    if [ -f "arch/arm64/configs/defconfig" ]; then
-        make defconfig
-        log "Using defconfig configuration."
+    # Use merge_kirin970_defconfig if available
+    if [ -f "arch/arm64/configs/merge_kirin970_defconfig" ]; then
+        make merge_kirin970_defconfig
+        log "Using merge_kirin970_defconfig configuration."
     else
-        warning "No defconfig found, using default configuration."
-        make menuconfig || make oldconfig || true
+        warning "merge_kirin970_defconfig not found, trying defconfig..."
+        if [ -f "arch/arm64/configs/defconfig" ]; then
+            make defconfig
+            log "Using defconfig configuration."
+        else
+            warning "No defconfig found, using default configuration."
+            make menuconfig || make oldconfig || true
+        fi
     fi
     
     log "Kernel configuration complete."

@@ -2,7 +2,7 @@
 
 ## 概述
 
-本项目使用GitHub Actions自动编译Android 4.9.148 kernel，源码来自Huawei Nova设备的kernel仓库。
+本项目使用GitHub Actions自动编译Android 4.9.148 kernel，源码来自Huawei Nova设备的kernel仓库。使用 `merge_kirin970_defconfig` 配置文件，针对Kirin 970芯片优化。
 
 ## 构建方式
 
