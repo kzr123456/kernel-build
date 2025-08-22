@@ -52,6 +52,10 @@ jobs:
           xz-utils \
           lz4 \
           zstd
+        # Fix DTC compilation issue by using older GCC version
+        sudo apt-get install -y gcc-9 g++-9
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
           
     - name: Download kernel source
       run: |
@@ -74,6 +78,11 @@ jobs:
         export PATH=$PWD/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH
         export CROSS_COMPILE=aarch64-linux-gnu-
         export ARCH=arm64
+        # Set environment variables to avoid DTC compilation issues
+        export HOSTCC=gcc-9
+        export HOSTCXX=g++-9
+        export CC=gcc-9
+        export CXX=g++-9
         make merge_kirin970_defconfig
         
     - name: Build kernel
@@ -82,6 +91,11 @@ jobs:
         export PATH=$PWD/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH
         export CROSS_COMPILE=aarch64-linux-gnu-
         export ARCH=arm64
+        # Set environment variables to avoid DTC compilation issues
+        export HOSTCC=gcc-9
+        export HOSTCXX=g++-9
+        export CC=gcc-9
+        export CXX=g++-9
         make -j$(nproc) Image modules
         
     - name: Package build artifacts

@@ -44,6 +44,12 @@ check_dependencies() {
         fi
     done
     
+    # Check for GCC-9 specifically to avoid DTC compilation issues
+    if ! command -v gcc-9 &> /dev/null; then
+        warning "GCC-9 not found. DTC compilation may fail."
+        warning "Consider installing gcc-9: sudo apt-get install gcc-9 g++-9"
+    fi
+    
     log "All dependencies are available."
 }
 
@@ -63,6 +69,17 @@ setup_build_env() {
     export PATH="$TOOLCHAIN_DIR/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH"
     export CROSS_COMPILE=aarch64-linux-gnu-
     export ARCH=arm64
+    
+    # Set GCC-9 for host tools to avoid DTC compilation issues
+    if command -v gcc-9 &> /dev/null; then
+        export HOSTCC=gcc-9
+        export HOSTCXX=g++-9
+        export CC=gcc-9
+        export CXX=g++-9
+        log "Using GCC-9 for host tools compilation."
+    else
+        warning "GCC-9 not available, using default GCC."
+    fi
     
     log "Build environment setup complete."
 }

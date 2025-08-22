@@ -28,7 +28,8 @@ sudo apt-get install -y \
   bc flex bison libssl-dev libncurses5-dev libncursesw5-dev \
   libelf-dev libdw-dev libslang2-dev libperl-dev pkg-config \
   libudev-dev libpci-dev libiberty-dev autoconf automake \
-  libtool cmake gawk rsync kmod cpio unzip zip xz-utils lz4 zstd
+  libtool cmake gawk rsync kmod cpio unzip zip xz-utils lz4 zstd \
+  gcc-9 g++-9
 ```
 
 #### 构建步骤
