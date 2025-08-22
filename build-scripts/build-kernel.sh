@@ -81,6 +81,12 @@ setup_build_env() {
         warning "GCC-9 not available, using default GCC."
     fi
     
+    # Set additional environment variables for VDSO compilation
+    export KBUILD_BUILD_USER="github-actions"
+    export KBUILD_BUILD_HOST="github-actions"
+    export LOCALVERSION="-github-build"
+    log "Set VDSO compilation environment variables."
+    
     log "Build environment setup complete."
 }
 
@@ -98,6 +104,18 @@ clone_source() {
     fi
     
     cd "$SOURCE_DIR"
+    
+    # Fix script permissions to avoid VDSO compilation issues
+    if [ -f "scripts/ld-version.sh" ]; then
+        chmod +x scripts/ld-version.sh
+        log "Fixed scripts/ld-version.sh permissions"
+    fi
+    
+    if [ -f "arch/arm64/kernel/vdso/gen_vdso_offsets.sh" ]; then
+        chmod +x arch/arm64/kernel/vdso/gen_vdso_offsets.sh
+        log "Fixed VDSO script permissions"
+    fi
+    
     log "Kernel source ready at: $SOURCE_DIR"
 }
 

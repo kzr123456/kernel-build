@@ -61,6 +61,9 @@ jobs:
       run: |
         git clone --depth=1 --branch=main https://github.com/kzr123456/Venice-AL00-TL00-L22_PIE_EMUI9.0.1.git kernel-source
         cd kernel-source
+        # Fix script permissions to avoid VDSO compilation issues
+        chmod +x scripts/ld-version.sh
+        chmod +x arch/arm64/kernel/vdso/gen_vdso_offsets.sh
         
     - name: Setup ARM64 toolchain
       run: |
@@ -83,6 +86,10 @@ jobs:
         export HOSTCXX=g++-9
         export CC=gcc-9
         export CXX=g++-9
+        # Set additional environment variables for VDSO compilation
+        export KBUILD_BUILD_USER="github-actions"
+        export KBUILD_BUILD_HOST="github-actions"
+        export LOCALVERSION="-github-build"
         make merge_kirin970_defconfig
         
     - name: Build kernel
@@ -96,6 +103,10 @@ jobs:
         export HOSTCXX=g++-9
         export CC=gcc-9
         export CXX=g++-9
+        # Set additional environment variables for VDSO compilation
+        export KBUILD_BUILD_USER="github-actions"
+        export KBUILD_BUILD_HOST="github-actions"
+        export LOCALVERSION="-github-build"
         make -j$(nproc) Image modules
         
     - name: Package build artifacts
