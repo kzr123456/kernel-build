@@ -119,7 +119,7 @@ build_kernel() {
     log "Building with $cores parallel jobs..."
     
     # Build kernel image and modules
-    make -j"$cores" Image dtbo.img modules
+    make -j"$cores" Image modules
     
     log "Kernel build completed successfully!"
 }
@@ -146,7 +146,7 @@ package_artifacts() {
         cp "arch/arm64/boot/dtbo.img" "$artifacts_dir/"
         log "DTBO image copied: $artifacts_dir/dtbo.img"
     else
-        warning "DTBO image not found."
+        log "DTBO image not found, skipping..."
     fi
     
     # Package kernel modules

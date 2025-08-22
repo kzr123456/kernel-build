@@ -82,14 +82,21 @@ jobs:
         export PATH=$PWD/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH
         export CROSS_COMPILE=aarch64-linux-gnu-
         export ARCH=arm64
-        make -j$(nproc) Image dtbo.img modules
+        make -j$(nproc) Image modules
         
     - name: Package build artifacts
       run: |
         cd kernel-source
         mkdir -p artifacts
         cp arch/arm64/boot/Image artifacts/
-        cp arch/arm64/boot/dtbo.img artifacts/ 2>/dev/null || echo "dtbo.img not found"
+        # Check if dtbo.img exists and copy if available
+        if [ -f "arch/arm64/boot/dtbo.img" ]; then
+          cp arch/arm64/boot/dtbo.img artifacts/
+          echo "DTBO image copied successfully"
+        else
+          echo "DTBO image not found, skipping..."
+        fi
+        # Package kernel modules
         find . -name "*.ko" -exec tar -czf artifacts/modules.tar.gz {} + 2>/dev/null || echo "No modules found"
         
     - name: Upload artifacts

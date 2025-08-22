@@ -22,7 +22,7 @@
 
 编译完成后，你可以在Actions的Artifacts中找到：
 - `Image` - 编译好的kernel镜像
-- `dtbo.img` - Device tree overlay镜像
+- `dtbo.img` - Device tree overlay镜像（如果支持）
 - `modules.tar.gz` - Kernel模块
 - 编译日志和错误信息
 
