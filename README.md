@@ -27,7 +27,7 @@
 
 ## 系统要求
 
-- Ubuntu 20.04 LTS (GitHub Actions运行环境)
+- Ubuntu 22.04 LTS (GitHub Actions运行环境)
 - ARM64交叉编译工具链
 - 必要的构建依赖包
 
