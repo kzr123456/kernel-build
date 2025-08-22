@@ -1,0 +1,107 @@
+name: Build Android 4.9.148 Kernel
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Setup build environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          git \
+          wget \
+          curl \
+          python3 \
+          python3-pip \
+          bc \
+          flex \
+          bison \
+          libssl-dev \
+          libncurses5-dev \
+          libncursesw5-dev \
+          libelf-dev \
+          libdw-dev \
+          libslang2-dev \
+          libperl-dev \
+          pkg-config \
+          libudev-dev \
+          libpci-dev \
+          libiberty-dev \
+          autoconf \
+          automake \
+          libtool \
+          cmake \
+          gawk \
+          rsync \
+          kmod \
+          cpio \
+          unzip \
+          zip \
+          xz-utils \
+          lz4 \
+          zstd
+          
+    - name: Download kernel source
+      run: |
+        git clone --depth=1 --branch=main https://github.com/kzr123456/Venice-AL00-TL00-L22_PIE_EMUI9.0.1.git kernel-source
+        cd kernel-source
+        
+    - name: Setup ARM64 toolchain
+      run: |
+        cd kernel-source
+        wget -O gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz \
+          https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+        tar -xf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+        export PATH=$PWD/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH
+        export CROSS_COMPILE=aarch64-linux-gnu-
+        export ARCH=arm64
+        
+    - name: Configure kernel
+      run: |
+        cd kernel-source
+        export PATH=$PWD/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH
+        export CROSS_COMPILE=aarch64-linux-gnu-
+        export ARCH=arm64
+        make defconfig
+        
+    - name: Build kernel
+      run: |
+        cd kernel-source
+        export PATH=$PWD/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH
+        export CROSS_COMPILE=aarch64-linux-gnu-
+        export ARCH=arm64
+        make -j$(nproc) Image dtbo.img modules
+        
+    - name: Package build artifacts
+      run: |
+        cd kernel-source
+        mkdir -p artifacts
+        cp arch/arm64/boot/Image artifacts/
+        cp arch/arm64/boot/dtbo.img artifacts/ 2>/dev/null || echo "dtbo.img not found"
+        find . -name "*.ko" -exec tar -czf artifacts/modules.tar.gz {} + 2>/dev/null || echo "No modules found"
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: kernel-build-artifacts
+        path: kernel-source/artifacts/
+        
+    - name: Build summary
+      run: |
+        echo "=== Kernel Build Summary ==="
+        echo "Build completed successfully!"
+        echo "Generated files:"
+        ls -la kernel-source/artifacts/ || echo "No artifacts directory found"
+        echo "=========================="
